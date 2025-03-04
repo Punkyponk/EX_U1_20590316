@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 # Inicialización de la aplicación Flask
@@ -28,6 +28,32 @@ class Post(db.Model):
     def __repr__(self):
         return f"<Post {self.title}>"
 
+# Ruta para mostrar todos los posts
+@app.route('/')
+def index():
+    posts = Post.query.all()  # Obtener todos los posts de la base de datos
+    return render_template('index.html', posts=posts)
+
+# Ruta para mostrar el formulario de creación de un post
+@app.route('/add', methods=['GET'])
+def add_post():
+    categories = Category.query.all()  # Obtener todas las categorías
+    return render_template('create_post.html', categories=categories)
+
+# Ruta para manejar el formulario de creación de un post
+@app.route('/add', methods=['POST'])
+def add_post_submit():
+    title = request.form['title']
+    content = request.form['content']
+    category_id = request.form['category_id']
+    
+    # Crear un nuevo post con los datos del formulario
+    post = Post(title=title, content=content, category_id=category_id)
+    db.session.add(post)
+    db.session.commit()
+    
+    return redirect(url_for('index'))  # Redirigir al index después de crear el post
+
 # Función para crear datos de prueba
 def create_data():
     # Verificar si la categoría con ID 2 existe, si no existe, crearla
@@ -47,11 +73,6 @@ def create_data():
     db.session.add(post)
     db.session.commit()
     print("Post creado exitosamente.")
-
-# Ruta para retornar "Hola Mundo"
-@app.route('/')
-def hola_mundo():
-    return "Hola Mundo"
 
 # Ejecutar la función cuando se corra el script
 if __name__ == '__main__':
