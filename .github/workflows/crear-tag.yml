@@ -5,14 +5,14 @@ on:
     types:
       - closed
     branches:
-      - master
+      - main
 
 permissions:
   contents: write
 
 jobs:
   tag_on_merge:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master'
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -20,7 +20,7 @@ jobs:
 
       - name: Create and push tag
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_JAIME }}
+          GITHUB_TOKEN: ${{ secrets.actionsamvela }}
         run: |
           TAG_NAME="${{ github.event.pull_request.title }}"
           git tag "$TAG_NAME"
